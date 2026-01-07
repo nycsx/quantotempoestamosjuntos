@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabe a Quanto Tempo ILY?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&family=Dancing+Script:wght@700&display=swap');
+
+        :root {
+            --planetary: #334EAC;
+            --venus: #BAD6EB;
+            --universe: #7096D1;
+            --meteor: #F7F2EB;
+            --galaxy: #081F5C;   
+            --milky-way: #FFF9F0; 
+            --sky: #D0E3FF;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--milky-way);
+            background-color: var(--galaxy);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- SLIDESHOW (FUNDO DA 2ª PÁGINA) --- */
+        .slideshow {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            opacity: 0; 
+            transition: opacity 2s ease;
+        }
+
+        .show-slideshow { opacity: 1; } 
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: slideAnimation 15s infinite;
+            transform: scale(1.1);
+        }
+
+        /* Animação das fotos de fundo (Se tiver 4 fotos, o ideal seria ajustar os tempos, mas com 3 no fundo funciona bem) */
+        .slide:nth-child(1) { animation-delay: 0s; }
+        .slide:nth-child(2) { animation-delay: 5s; }
+        .slide:nth-child(3) { animation-delay: 10s; }
+
+        @keyframes slideAnimation {
+            0% { opacity: 0; } 10% { opacity: 1; } 33% { opacity: 1; } 43% { opacity: 0; } 100% { opacity: 0; }
+        }
+
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(8, 31, 92, 0.9), rgba(8, 31, 92, 0.7));
+            z-index: -1;
+        }
+
+        /* --- EFEITO GALÁXIA --- */
+        .star-heart {
+            position: absolute; color: white; opacity: 0; z-index: 0;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            font-size: var(--size);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: var(--opacity); transform: scale(1); }
+        }
+
+        /* --- POLAROIDS DA TELA INICIAL --- */
+        .polaroid-container {
+            position: absolute; width: 100%; height: 100%;
+            top: 0; left: 0; pointer-events: none; z-index: 5;
+        }
+
+        .polaroid {
+            position: absolute;
+            background-color: white; 
+            padding: 8px 8px 35px 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 150px; height: 190px; 
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
+            animation: floatPolaroid 8s infinite ease-in-out;
+            opacity: 0;
+        }
+
+        /* Posições das polaroids (Desktop) - Mais afastadas das bordas usando % */
+        .p1 { top: 10%; left: 12%; animation-delay: 0s; transform: rotate(-15deg); }
+        .p2 { top: 15%; right: 12%; animation-delay: 2s; transform: rotate(10deg); }
+        .p3 { bottom: 12%; right: 15%; animation-delay: 4s; transform: rotate(-8deg); }
+        .p4 { bottom: 15%; left: 10%; animation-delay: 6s; transform: rotate(12deg); }
+
+        @keyframes floatPolaroid {
+            0% { opacity: 0; transform: translateY(20px) rotate(var(--rot)); }
+            20% { opacity: 1; transform: translateY(0) rotate(var(--rot)); }
+            80% { opacity: 1; transform: translateY(-10px) rotate(var(--rot)); }
+            100% { opacity: 0; transform: translateY(-30px) rotate(var(--rot)); }
+        }
+
+        /* --- TELAS --- */
+        #intro-screen {
+            z-index: 10; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: transparent; 
+        }
+
+        .container {
+            z-index: 10; text-align: center; display: none; 
+            flex-direction: column; align-items: center;
+            animation: fadeIn 2s ease; position: relative;
+            width: 100%;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive; font-size: 3.5rem; margin-bottom: 15px;
+            color: var(--sky); text-shadow: 0 0 15px rgba(208, 227, 255, 0.8);
+        }
+        p.subtitle {
+            font-size: 1.2rem; margin-bottom: 40px; letter-spacing: 1px;
+            color: var(--venus); line-height: 1.5;
+        }
+
+        /* --- TIMER --- */
+        .timer-container {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; max-width: 900px;
+        }
+        .time-box {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255, 0.2); padding: 25px; border-radius: 20px;
+            min-width: 110px; display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); transition: transform 0.3s;
+        }
+        .time-box:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.15); }
+        .time-box span { font-size: 3rem; font-weight: 600; color: var(--milky-way); }
+        .time-box small { font-size: 0.85rem; text-transform: uppercase; color: var(--sky); margin-top: 5px; }
+
+        /* --- BOTÕES --- */
+        button {
+            padding: 18px 50px; font-size: 1.3rem; background: transparent;
+            color: var(--milky-way); border: 2px solid var(--sky); border-radius: 50px;
+            cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all 0.4s ease;
+            box-shadow: 0 0 15px rgba(208, 227, 255, 0.2); text-transform: uppercase; letter-spacing: 2px;
+            position: relative; z-index: 20;
+        }
+        button:hover {
+            background-color: var(--sky); color: var(--galaxy);
+            transform: scale(1.05); box-shadow: 0 0 40px rgba(208, 227, 255, 0.6);
+        }
+
+        /* Botão de Voltar */
+        .back-btn {
+            margin-top: 40px; 
+            padding: 10px 30px;
+            font-size: 1rem;
+            border-color: var(--venus);
+        }
+
+        .back-btn:hover {
+            background-color: var(--venus);
+            color: var(--galaxy);
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'  width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>💙</text></svg>") 16 0, auto; 
+        }
+
+        audio { display: none; }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            .polaroid { width: 100px; height: 130px; }
+            .time-box { min-width: 80px; padding: 15px; }
+            .time-box span { font-size: 1.8rem; }
+            
+            /* Ajuste de posição no celular para as 4 fotos */
+            .p1 { top: 5%; left: 5%; } 
+            .p2 { top: 5%; right: 5%; } 
+            .p3 { bottom: 8%; right: 5%; } 
+            .p4 { bottom: 8%; left: 5%; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="player" loop>
+        <source src="SpotiDownloader (mp3cut.net).mp3" type="audio/mp3">
+    </audio>
+
+    <div class="slideshow" id="slideshow-bg">
+        <div class="slide" style="background-image: url('canoa.JPG');"></div>
+        <div class="slide" style="background-image: url('canoa\ 2.jpg');"></div>
+        <div class="slide" style="background-image: url('canos\ 3.JPG');"></div>
+    </div>
+
+    <div class="overlay"></div>
+    
+    <div id="intro-screen">
+        
+        <div class="polaroid-container">
+            <div class="polaroid p1" style="background-image: url('passeio.JPG'); --rot: -15deg;"></div>
+            <div class="polaroid p2" style="background-image: url('praia.JPG'); --rot: 10deg;"></div>
+            <div class="polaroid p3" style="background-image: url('crianças.JPG'); --rot: -8deg;"></div>
+            <div class="polaroid p4" style="background-image: url('ano\ novo.JPG'); --rot: 12deg;"></div>
+        </div>
+
+        <h1 style="font-size: 2.5rem; margin-bottom: 2rem; text-align: center; z-index: 20;">Sabe há quanto tempo<br>eu te amo, Branquelo?</h1>
+        <button onclick="startExperience()">Clique aqui para saber!</button>
+    </div>
+
+    <div class="container" id="main-content">
+        <h1>Tempo que Estamos Construindo a Nossa História</h1>
+        <p class="subtitle">Cada segundo ao seu lado conta meu Branquelo. <br>Obrigada por ser casa e por estar por mim hoje e sempre.</p>
+
+        <div class="timer-container">
+            <div class="time-box"><span id="years">0</span><small>Anos</small></div>
+            <div class="time-box"><span id="months">0</span><small>Meses</small></div>
+            <div class="time-box"><span id="days">0</span><small>Dias</small></div>
+            <div class="time-box"><span id="hours">0</span><small>Horas</small></div>
+            <div class="time-box"><span id="minutes">0</span><small>Minutos</small></div>
+            <div class="time-box"><span id="seconds">0</span><small>Segundos</small></div>
+        </div>
+
+        <button class="back-btn" onclick="goBack()">Voltar</button>
+    </div>
+
+    <script>
+        // DATA DE INÍCIO: 08/07/2023 -> (2023, 6, 8)
+        const startDate = new Date(2023, 6, 8, 0, 0, 0); 
+        const audio = document.getElementById('player');
+
+        window.onload = function() {
+            createGalaxy();
+            setInterval(updateTimer, 1000); 
+            updateTimer(); 
+        };
+
+        function startExperience() {
+            document.getElementById('intro-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'flex';
+            document.getElementById('slideshow-bg').classList.add('show-slideshow'); 
+            
+            audio.volume = 0.5;
+            audio.play().catch(error => console.log("Interação necessária."));
+        }
+
+        function goBack() {
+            document.getElementById('intro-screen').style.display = 'flex';
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('slideshow-bg').classList.remove('show-slideshow'); 
+            audio.pause();
+            audio.currentTime = 0; 
+        }
+
+        function updateTimer() {
+            const now = new Date();
+
+            let years = now.getFullYear() - startDate.getFullYear();
+            let months = now.getMonth() - startDate.getMonth();
+            let days = now.getDate() - startDate.getDate();
+            let hours = now.getHours() - startDate.getHours();
+            let minutes = now.getMinutes() - startDate.getMinutes();
+            let seconds = now.getSeconds() - startDate.getSeconds();
+
+            if (seconds < 0) { seconds += 60; minutes--; }
+            if (minutes < 0) { minutes += 60; hours--; }
+            if (hours < 0) { hours += 24; days--; }
+            if (days < 0) {
+                const previousMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                days += previousMonth.getDate();
+                months--;
+            }
+            if (months < 0) { months += 12; years--; }
+
+            document.getElementById('years').innerText = years;
+            document.getElementById('months').innerText = months;
+            document.getElementById('days').innerText = days;
+            document.getElementById('hours').innerText = hours;
+            document.getElementById('minutes').innerText = minutes;
+            document.getElementById('seconds').innerText = seconds;
+        }
+
+        function createGalaxy() {
+            const container = document.body;
+            const count = 50; 
+
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.innerHTML = Math.random() > 0.5 ? '🤍' : '✦';
+                star.className = 'star-heart';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                const size = Math.random() * 15 + 5 + 'px';
+                const duration = Math.random() * 3 + 2 + 's';
+                const opacity = Math.random() * 0.7 + 0.3;
+
+                star.style.setProperty('--size', size);
+                star.style.setProperty('--duration', duration);
+                star.style.setProperty('--opacity', opacity);
+                star.style.animationDelay = Math.random() * 5 + 's';
+
+                container.appendChild(star);
+            }
+        }
+    </script>
+</body>
+</html>
